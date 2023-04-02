@@ -92,6 +92,8 @@ title Note Creation SPA Version
 
     browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
     activate server
+
+    Note left of server: Server stores the notes
     server-->>browser: {"message": "note created"}
     deactivate server 
 ```
