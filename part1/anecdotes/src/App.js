@@ -21,26 +21,26 @@ const App = () => {
       <h2>Anecdote of the day</h2>
       <p>"{anecdotes[selected]}"</p>
       <p>has {votes[selected]} votes</p>
-      <button
-        onClick={() => {
+      <Button
+        handler={() => {
           setSelected(Math.floor(Math.random() * (anecdotes.length - 1)));
         }}
-      >
-        Next Anecdote
-      </button>
-      <button
-        onClick={() => {
+        name="Next Anecdote"
+      />
+      <Button
+        handler={() => {
           let a = [...votes];
           a[selected] += 1;
           setVotes(a);
         }}
-      >
-        Vote
-      </button>
+        name="Vote"
+      />
       <h2>Anecdote with the most votes</h2>
-      <p>"{anecdotes[votes.findIndex(a => a === Math.max(...votes))]}"</p>
+      <p>"{anecdotes[votes.findIndex((a) => a === Math.max(...votes))]}"</p>
     </div>
   );
 };
+
+const Button = ({ handler, name }) => <button onClick={handler}>{name}</button>;
 
 export default App;
