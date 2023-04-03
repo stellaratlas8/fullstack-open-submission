@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Numbers from "./components/Numbers";
+import Notification from "./components/Notification";
 
 import bookService from "./services/book";
 
@@ -12,9 +13,21 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
+  const [notification, setNotification] = useState(null);
+  const [success, setSuccess] = useState(false);
+
   useEffect(() => {
     bookService.getAll().then(setPersons);
   }, []);
+
+  const notify = (success, message) => {
+    setNotification(message);
+    setSuccess(success);
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
 
   const addName = (event) => {
     event.preventDefault();
@@ -33,34 +46,63 @@ const App = () => {
           `${newName} is already added to the phonebook, replace the old number with the new one?`
         )
       ) {
-        bookService.update(found.id, data).then((returnedData) => {
-          setPersons(
-            persons.map((person) =>
-              person.id === returnedData.id ? data : person
-            )
-          );
-        });
+        bookService
+          .update(found.id, data)
+          .then((returnedData) => {
+            setPersons(
+              persons.map((person) =>
+                person.id === returnedData.id ? data : person
+              )
+            );
+            notify(true, `${found.name} modified`);
+          })
+          .catch((_) => {
+            notify(
+              false,
+              `The entry for '${found.name}' was already removed from server`
+            );
+            setPersons(persons.filter((person) => person.id !== found.id));
+          });
       }
     } else {
-      bookService.create(data).then((returnedData) => {
-        setPersons(persons.concat(returnedData));
-        setNewName("");
-        setNewNumber("");
-      });
+      bookService
+        .create(data)
+        .then((returnedData) => {
+          setPersons(persons.concat(returnedData));
+          setNewName("");
+          setNewNumber("");
+          notify(true, `Added '${newName}' to the list`);
+        })
+        .catch(_ => {
+          // maybe
+          notify(
+            false,
+            `'${data.name}' has already been added to the server`
+          );
+        });
     }
   };
 
   const deleteName = (id) => {
+    let target = persons.find((person) => person.id === id);
     if (
       window.confirm(
-        `Would you like to delete ${
-          persons.find((person) => person.id === id).name
-        }'s number from the list?`
+        `Would you like to delete ${target.name}'s number from the list?`
       )
     ) {
-      bookService.deleteId(id).then((response) => {
-        setPersons(persons.filter((person) => person.id !== id));
-      });
+      bookService
+        .deleteId(id)
+        .then((response) => {
+          setPersons(persons.filter((person) => person.id !== id));
+          notify(true, `Deleted '${target.name}' from the list`);
+        })
+        .catch((_) => {
+          notify(
+            false,
+            `The entry for '${target.name}' was already removed from server`
+          );
+          setPersons(persons.filter((person) => person.id !== target.id));
+        });
     }
   };
 
@@ -80,6 +122,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Filter value={filter} onChange={handleFilterChange} />
+      <Notification success={success} message={notification} />
 
       <h2>Add a new number</h2>
       <PersonForm
