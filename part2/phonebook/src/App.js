@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Numbers from "./components/Numbers";
+
+import bookService from "./services/book"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -7,12 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
-  const baseUrl = "http://localhost:3001/persons";
-
   useEffect(() => {
-    axios.get(baseUrl).then((response) => {
-      setPersons(response.data);
-    });
+    bookService.getAll().then(setPersons);
   }, []);
 
   const addName = (event) => {
@@ -29,12 +30,19 @@ const App = () => {
         name: newName,
       };
 
-      axios.post(baseUrl, data).then(() => {
-        setPersons(persons.concat(data));
+      bookService.create(data).then(returnedData => {
+        setPersons(persons.concat(returnedData));
         setNewName("");
         setNewNumber("");
       });
     }
+  };
+
+  const deleteName = id => {
+    if(!window.confirm(`Would you like to delete ${persons[id].name}'s number from the list?`)) return
+    bookService.deleteName(id).then(returnedData => {
+      setPersons(persons.filter(person => person.id !== id));
+    })
   };
 
   const handleNameChange = (event) => {
@@ -64,49 +72,9 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Numbers persons={persons} filter={filter} />
+      <Numbers persons={persons} filter={filter} onDelete={deleteName} />
     </div>
   );
 };
-
-const PersonForm = ({
-  newName,
-  newNumber,
-  onNameChange,
-  onNumberChange,
-  onSubmit,
-}) => {
-  return (
-    <form onSubmit={onSubmit}>
-      <div>
-        Name: <input value={newName} onChange={onNameChange} />
-      </div>
-      <div>
-        Number: <input value={newNumber} onChange={onNumberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  );
-};
-
-const Numbers = ({ persons, filter }) => (
-  <div>
-    {persons
-      .filter((person) => person.name.includes(filter))
-      .map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
-      ))}
-  </div>
-);
-
-const Filter = ({ value, onChange }) => (
-  <div>
-    Name Filter: <input value={value} onChange={onChange} />
-  </div>
-);
 
 export default App;
