@@ -4,7 +4,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Numbers from "./components/Numbers";
 
-import bookService from "./services/book"
+import bookService from "./services/book";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -18,19 +18,31 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault();
-    if (
-      persons.find((person) => person.name === newName) ||
-      persons.find((person) => person.number === newNumber)
-    ) {
-      alert(`${newName} or ${newNumber} is already added to phonebook`);
-    } else {
-      let data = {
-        id: persons.length + 1,
-        number: newNumber,
-        name: newName,
-      };
+    let found = persons.find((person) => person.name === newName);
+    let data = {
+      id: found
+        ? found.id
+        : persons.reduce((t, a) => (a > t ? a.id + 1 : t), 0),
+      number: newNumber,
+      name: newName,
+    };
 
-      bookService.create(data).then(returnedData => {
+    if (found) {
+      if (
+        window.confirm(
+          `${newName} is already added to the phonebook, replace the old number with the new one?`
+        )
+      ) {
+        bookService.update(found.id, data).then((returnedData) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === returnedData.id ? data : person
+            )
+          );
+        });
+      }
+    } else {
+      bookService.create(data).then((returnedData) => {
         setPersons(persons.concat(returnedData));
         setNewName("");
         setNewNumber("");
@@ -38,11 +50,18 @@ const App = () => {
     }
   };
 
-  const deleteName = id => {
-    if(!window.confirm(`Would you like to delete ${persons[id].name}'s number from the list?`)) return
-    bookService.deleteName(id).then(returnedData => {
-      setPersons(persons.filter(person => person.id !== id));
-    })
+  const deleteName = (id) => {
+    if (
+      window.confirm(
+        `Would you like to delete ${
+          persons.find((person) => person.id === id).name
+        }'s number from the list?`
+      )
+    ) {
+      bookService.deleteId(id).then((response) => {
+        setPersons(persons.filter((person) => person.id !== id));
+      });
+    }
   };
 
   const handleNameChange = (event) => {
