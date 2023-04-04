@@ -11,7 +11,7 @@ const Weather = ({ country }) => {
       .getWeatherByCoord(...country.capitalInfo.latlng)
       .then((data) => {
         setWeather(data);
-      }, [])
+      })
       .catch((err) => {});
   });
 
