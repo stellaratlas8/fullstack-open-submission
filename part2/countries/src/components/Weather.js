@@ -13,7 +13,7 @@ const Weather = ({ country }) => {
         setWeather(data);
       })
       .catch((err) => {});
-  });
+  }, []);
 
   if (weather === null) return <p>Loading weather...</p>;
 
@@ -22,7 +22,7 @@ const Weather = ({ country }) => {
       <h4>Weather in {capital}</h4>
       <p>Temperature: {weather.main.temp} Celsius</p>
       <img
-        src={`${weatherService.imgUrl}/${weather.weather[0].icon}.png`}
+        src={`${weatherService.imgUrl}/${weather.weather[0].icon}@2x.png`}
         alt="Weather icon could not be loaded"
         width="50px"
       />
