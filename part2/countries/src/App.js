@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import countryService from "./services/countries";
+import Results from "./components/Results";
 
-function App() {
+const { name, capital, languages, area, currencies, flags, capitalInfo } = countryService.fields;
+
+const App = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    if (searchQuery!== "") {
+      countryService
+        .searchByName(searchQuery, [
+          name,
+          capital,
+          languages,
+          area,
+          currencies,
+          flags,
+          capitalInfo,
+        ])
+        .then((countries) => {
+          setResults(countries);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    } else setResults([]);
+  }, [searchQuery]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h2>Country search</h2>
+      Search: <input value={searchQuery} onChange={handleSearchChange} />
+
+      <Results results={results} />
     </div>
   );
-}
+};
 
 export default App;
