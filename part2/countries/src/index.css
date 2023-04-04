@@ -1,0 +1,14 @@
+div.search {
+  border-radius: 1px;
+  border-style: ridge;
+}
+div.result {
+  border-radius: 1px;
+  border-style: ridge;
+}
+
+div.results {
+  margin-top: 40px;
+  border-radius: 1px;
+  border-style: ridge;
+}

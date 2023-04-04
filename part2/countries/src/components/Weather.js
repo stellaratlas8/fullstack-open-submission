@@ -18,7 +18,7 @@ const Weather = ({ country }) => {
   if (weather === null) return <p>Loading weather...</p>;
 
   return (
-    <div>
+    <div class="weather">
       <h4>Weather in {capital}</h4>
       <p>Temperature: {weather.main.temp} Celsius</p>
       <img

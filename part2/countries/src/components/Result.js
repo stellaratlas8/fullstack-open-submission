@@ -10,7 +10,7 @@ const Result = ({ country, collapsible }) => {
 
   if (!shown && collapsible) {
     return (
-      <div>
+      <div class="result">
         <h3>
           {country.name.common}
           <button onClick={handleShow}>Show Information</button>
@@ -20,7 +20,7 @@ const Result = ({ country, collapsible }) => {
   }
 
   return (
-    <div>
+    <div class="result">
       <h3>
         {country.name.official}
         {collapsible ? (

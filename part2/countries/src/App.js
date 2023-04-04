@@ -35,8 +35,10 @@ const App = () => {
 
   return (
     <div>
-      <h2>Country search</h2>
-      Search: <input value={searchQuery} onChange={handleSearchChange} />
+      <div class="search">
+        <h2>Country search</h2>
+        Search: <input value={searchQuery} onChange={handleSearchChange} />
+      </div>
 
       <Results results={results} />
     </div>
